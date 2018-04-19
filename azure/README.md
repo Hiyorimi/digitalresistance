@@ -4,7 +4,7 @@
  - энвы BANLIST_TOKEN, BANLIST_SERVER
  - Заменить DIGITAL_RESISTANCE_IMAGE в cloud-init-tg-proxy-ubuntu16
  - Проверить Python 3 `python3 --version`
- - Установить NodeJS 9 (https://nodejs.org/en/)[https://nodejs.org/en/]
+ - Установить [NodeJS 9](https://nodejs.org/en/)
  - Установить пакеты в папке azure `npm install`
 
 ## Команды

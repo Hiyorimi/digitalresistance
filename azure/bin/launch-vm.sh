@@ -103,7 +103,7 @@ function create_vm() {
     --vnet-name $vnet \
     --nic-names $vm_nic_list \
     --image-urn $image \
-    --custom-data cloud-init-tg-proxy-ubuntu16.sh \
+    --custom-data cloud-init-ubuntu16.sh \
     --admin-username nick \
     --ssh-publickey-file $pub_key_path
 }

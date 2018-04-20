@@ -1,9 +1,7 @@
 # Azure scripts
 
 ## Настройки
- - Прокинуть энвы `BANLIST_TOKEN`, `BANLIST_SERVER`
  - Заменить DIGITAL_RESISTANCE_IMAGE в `cloud-init-ubuntu16.sh`
- - Проверить Python 3 `python3 --version` (TODO: избавиться от питон зависимости)
  - Установить [NodeJS 9](https://nodejs.org/en/)
  - Установить `npm i -g azure-cli` (TODO: избавиться потом)
  - Установить `brew install azure-cli` или `pip install azure-cli`

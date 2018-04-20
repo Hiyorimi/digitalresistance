@@ -20,11 +20,12 @@ module.exports = {
   rules: {
     'no-underscore-dangle': 0,
     'no-console': 0,
+    'no-await-in-loop': 0,
     'prettier/prettier': [
       'error',
       {
         singleQuote: true,
-        printWidth: 80,
+        printWidth: 70,
         trailingComma: 'es5',
         semi: false,
       }

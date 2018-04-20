@@ -1,13 +1,16 @@
-#!/usr/bin/env node
+/* eslint-disable no-restricted-syntax,no-await-in-loop */
 import B from 'bluebird'
-import path from 'path'
 import chalk from 'chalk'
+import fetch from 'node-fetch'
+import * as R from 'ramda'
 import config from './config'
-import { listAllIPs, execLogLive, azureJson, execLogLiveAsync } from './utils'
+import { listAllIPs, execLogLive, azureJson } from './utils'
 
 const { resourceGroup } = config
 
-const getVMInfo = vm => azureJson(`az vm show -g ${resourceGroup} -n ${vm}`)
+const getVMInfo = vm =>
+  azureJson(`az vm show -g ${resourceGroup} -n ${vm}`)
+
 const getNicInfo = nic =>
   azureJson(`az network nic show -g ${resourceGroup} -n ${nic}`)
 
@@ -19,7 +22,8 @@ const findNic = ({
 
 const findNameFromId = id => id.split(/\//g).slice(-1)[0]
 
-const getNextName = name => name.replace(/(\d+)$/, n => parseInt(n, 10) + 1)
+const getNextName = name =>
+  name.replace(/(\d+)$/, n => parseInt(n, 10) + 1)
 
 const changeIp = vmInfo => {
   const currentNic = findNic(vmInfo)
@@ -33,11 +37,11 @@ const changeIp = vmInfo => {
   // Allocate new Static IP
   execLogLive(
     `
-azure network public-ip create \\
-  --name ${ipName} \\
-  --resource-group ${resourceGroup} \\
-  --allocation-method Static \\
-  --location ${vmInfo.location.toLowerCase()}
+  azure network public-ip create \\
+    --name ${ipName} \\
+    --resource-group ${resourceGroup} \\
+    --allocation-method Static \\
+    --location ${vmInfo.location.toLowerCase()}
 `
   )
 
@@ -66,29 +70,31 @@ azure network public-ip create \\
   `)
 }
 
-const checkIsBanned = ip =>
-  execLogLiveAsync(`./is_banned.py ${ip}`).then(result => result.trim() === '1')
-
-const downloadBanLists = () => execLogLive(path.join(__dirname, 'download-banlist.sh'))
+const checkIsBanned = R.pipeP(
+  ip => fetch(`https://tgproxy.me/rkn/backend.php?ip=${ip}`),
+  res => res.json(),
+  R.propEq('blocked', true)
+)
 
 const main = async () => {
   while (true) {
-    console.log('Upading RKN lists')
-    downloadBanLists()
     console.log('Fetching current VM public IP list')
     const vms = listAllIPs()
 
     for (const [vm, { ipAddress }] of vms) {
       console.log(`${vm} ${ipAddress}`)
       if (await checkIsBanned(ipAddress)) {
-        console.log(chalk.bgRed.inverse(`VM ${vm} is banned, changing IP...`))
+        console.log(
+          chalk.bgRed.inverse(`[Ban] ${vm}, changing IP...`)
+        )
         changeIp(getVMInfo(vm))
       } else {
-        console.log(chalk.bgGreen.inverse(`VM ${vm} is not banned`))
+        console.log(chalk.bgGreen.inverse(`[OK] ${vm}`))
       }
     }
 
-    console.log(`waiting 1hr from ${new Date()}`)
+    console.log(`Waiting 1 hr from ${new Date()}`)
+
     await B.delay(60 * 60 * 1000)
   }
 }

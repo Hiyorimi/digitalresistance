@@ -8,6 +8,7 @@ require 'net/ssh'
 AWS_KEY = ENV['AWS_KEY']
 AWS_SECRET = ENV['AWS_SECRET']
 
+MAX_ATTEMPT_COUNT = 10
 
 REGIONS = ['eu-central-1', 'us-east-1', 'us-east-2', 'us-west-2', 'ap-northeast-1', 'eu-west-3', 'ca-central-1', 'ap-northeast-2', 'ap-south-1', 'eu-west-1', 'ap-southeast-1']
 
@@ -87,7 +88,7 @@ REGIONS.each do |region|
 
     _address = address
 
-    while invalid_count < 10 && (valid == false || first_time)
+    while invalid_count < MAX_ATTEMPT_COUNT && (valid == false || first_time)
 
       unless first_time
 
@@ -120,6 +121,17 @@ REGIONS.each do |region|
       end
 
       first_time = false
+
+    end
+
+    if invalid_count == MAX_ATTEMPT_COUNT
+
+      puts "    associate instance #{instance_id}..."
+
+      ec2_client.associate_address({
+                                       allocation_id: _address.allocation_id,
+                                       instance_id: instance_id,
+                                   })
 
     end
 

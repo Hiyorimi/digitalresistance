@@ -1,0 +1,6 @@
+terraform/.terraform/
+terraform/terraform.tfstate
+terraform/az*.tf
+terraform/[^v]*.tf
+tg_rsa
+tg_rsa.pub

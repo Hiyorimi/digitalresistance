@@ -1,0 +1,6 @@
+---
+
+- name: Generating .tf file for region {{ vm_location }}
+  template:
+    src: region.tf.j2
+    dest: "{{ terraform_dir }}/{{ vm_location }}.tf"

@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "list": "node bin/list-vm.js",
-    "rotate": "node bin/rotate-ip.js",
+    "monitor": "node bin/monitor.js",
     "launch": "bash bin/launch-vm.sh"
   },
   "author": "",
@@ -23,6 +23,7 @@
     "date-fns": "^2.0.0-alpha.7",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "node-fetch": "^2.1.2",
+    "node-ssh": "^5.1.1",
     "ramda": "^0.25.0"
   },
   "devDependencies": {

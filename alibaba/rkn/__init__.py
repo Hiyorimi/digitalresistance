@@ -1,7 +1,7 @@
 import ipaddress
 from xml.dom import minidom
 
-from alibaba import RKN_DB_PATH
+from main import RKN_DB_PATH
 
 reasons = False
 

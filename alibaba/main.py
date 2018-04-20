@@ -8,12 +8,10 @@ from aliyunsdkecs.request.v20140526.AllocateEipAddressRequest import AllocateEip
 from aliyunsdkecs.request.v20140526.AssociateEipAddressRequest import AssociateEipAddressRequest
 from aliyunsdkecs.request.v20140526.DescribeEipAddressesRequest import DescribeEipAddressesRequest
 from aliyunsdkecs.request.v20140526.ReleaseEipAddressRequest import ReleaseEipAddressRequest
-
-import alibaba
-from alibaba.credentionals import ACCESS_KEY, SECRET_KEY
+from credentionals import ACCESS_KEY, SECRET_KEY
 
 try:
-    from alibaba.local_credentionals import ACCESS_KEY, SECRET_KEY
+    from local_credentionals import ACCESS_KEY, SECRET_KEY
 except ImportError:
     pass
 
@@ -24,9 +22,11 @@ except IndexError:
     print("Usage python main.py path/to/rkn_dump.xml alibaba-region-id")
     exit(1)
 
-alibaba.RKN_DB_PATH = path_to_rkn_db
+from credentionals import RKN_DB_PATH
 
-from alibaba import rkn
+RKN_DB_PATH = path_to_rkn_db
+
+import rkn
 
 REGION_ID = region.strip()
 

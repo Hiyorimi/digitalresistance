@@ -1,0 +1,14 @@
+---
+- name: Generate Terraform .tf-file for creating regional resources
+  hosts: localhost
+  vars:
+    terraform_dir: "../terraform"
+  vars_prompt:
+    - name: vm_location
+      prompt: "Enter resource group location (uksouth/southeastasia/etc.)"
+      default: "southeastasia"
+      private: no
+
+  tasks:
+  - name: Generate regional resources
+    include_tasks: tasks/azure_region.yml

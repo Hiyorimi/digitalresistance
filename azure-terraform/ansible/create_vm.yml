@@ -1,0 +1,26 @@
+---
+- name: Generate Terraform .tf-file for creating VM
+  hosts: localhost
+  vars:
+    terraform_dir: "../terraform"
+  vars_prompt:
+    - name: vm_location
+      prompt: "Enter VM location (uksouth/southeastasia/etc.)"
+      default: "southeastasia"
+      private: no
+    - name: vm_group_name
+      prompt: "Enter VM group name"
+      default: "az-test"
+      private: no
+    - name: vm_count
+      prompt: "Enter count of VMs in group"
+      default: 1
+      private: no
+    - name: vm_size
+      prompt: "Enter VM(s) size (Standard_D2s_v3/Standard_D2_v2/etc.)"
+      default: "Standard_D2s_v3"
+      private: no
+
+  tasks:
+  - name: Generate VMs
+    include_tasks: tasks/azure_vm.yml

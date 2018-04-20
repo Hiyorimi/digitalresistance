@@ -1,0 +1,88 @@
+{% for vm_number in range(vm_count|int) %}
+{% set vm_name = vm_group_prefix + "-" + vm_location + "-" + vm_group_suffix + "-" + vm_number|string %}
+
+resource "azurerm_public_ip" "{{ vm_name }}-eth0-public-ip" {
+  name                         = "{{ vm_name }}-eth0-public-ip"
+  location                     = "{{ vm_location }}"
+  resource_group_name          = "${azurerm_resource_group.tg-{{ vm_location }}.name}"
+  public_ip_address_allocation = "static"
+}
+
+resource "azurerm_network_interface" "{{ vm_name }}-eth0" {
+  name                = "{{ vm_name }}-eth0"
+  location            = "{{ vm_location }}"
+  resource_group_name = "${azurerm_resource_group.tg-{{ vm_location }}.name}"
+
+  network_security_group_id = "${azurerm_network_security_group.tg-{{ vm_location }}-sg.id}"
+  
+  ip_configuration {
+    name                          = "ipconfig1"
+    subnet_id                     = "${azurerm_subnet.tg-{{ vm_location }}-default-subnet.id}"
+    private_ip_address_allocation = "dynamic"
+    public_ip_address_id          = "${azurerm_public_ip.{{ vm_name }}-eth0-public-ip.id}"
+  }
+}
+
+resource "azurerm_virtual_machine" "{{ vm_name }}" {
+  name                          = "{{ vm_name }}"
+  location                      = "{{ vm_location }}"
+  resource_group_name           = "${azurerm_resource_group.tg-{{ vm_location }}.name}"
+  network_interface_ids         = ["${azurerm_network_interface.{{ vm_name }}-eth0.id}"]
+  primary_network_interface_id  = "${azurerm_network_interface.{{ vm_name }}-eth0.id}"
+  vm_size                       = "{{ vm_size }}"
+  delete_os_disk_on_termination = true
+
+  storage_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "16.04-LTS"
+    version   = "latest"
+  }
+
+  storage_os_disk {
+    name              = "{{ vm_name }}-OS-Disk"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+
+  os_profile {
+    computer_name  = "{{ vm_name }}"
+    admin_username = "${var.os_profile_admin_username}"
+  }
+
+  os_profile_linux_config {
+    disable_password_authentication = true
+
+    ssh_keys {
+      path     = "${var.ssh_keys_path}"
+      key_data = "${var.ssh_key_data}"
+    }
+  }
+
+  connection {
+    host = "${azurerm_public_ip.{{ vm_name }}-eth0-public-ip.ip_address}"
+    user = "${var.os_profile_admin_username}"
+    type = "ssh"
+    private_key = "${file("../tg_rsa")}"
+    timeout = "5m"
+    agent = true
+  }
+
+  provisioner "file" {
+    source      = "init.sh"
+    destination = "/tmp/init.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/init.sh",
+      "sudo bash /tmp/init.sh ${var.docker_image}",
+    ]
+  }
+}
+
+output "{{ vm_name }}-ip" {
+  value = "${azurerm_public_ip.{{ vm_name }}-eth0-public-ip.ip_address}"
+}
+{% endfor %}

@@ -1,0 +1,43 @@
+---
+- name: Generate Terraform .tf files
+  hosts: localhost
+  vars:
+    terraform_dir: "../terraform"
+    azure_infra:
+      - { vm_location: "brazilsouth", vm_size: "Standard_A2", vm_count: 5 }
+      - { vm_location: "canadaeast", vm_size: "Standard_D2s_v3", vm_count: 5 }
+      - { vm_location: "centralindia", vm_size: "Standard_D2s_v3", vm_count: 5 }
+      - { vm_location: "eastasia", vm_size: "Standard_D2s_v3", vm_count: 5 }
+      - { vm_location: "eastus", vm_size: "Standard_D2s_v3", vm_count: 5 }
+      - { vm_location: "eastus2", vm_size: "Standard_D2_v3", vm_count: 5 }
+      - { vm_location: "japaneast", vm_size: "Standard_A2_v2", vm_count: 5 }
+      - { vm_location: "japanwest", vm_size: "Standard_A2", vm_count: 5 }
+      - { vm_location: "koreasouth", vm_size: "Standard_DS2_v2", vm_count: 5 }
+      - { vm_location: "southcentralus", vm_size: "Standard_D2s_v3", vm_count: 5 }
+      - { vm_location: "southindia", vm_size: "Standard_D2s_v3", vm_count: 5 }
+      - { vm_location: "uksouth", vm_size: "Standard_D2s_v3", vm_count: 5 }
+      - { vm_location: "ukwest", vm_size: "Standard_D2s_v3", vm_count: 5 }
+      - { vm_location: "westeurope", vm_size: "Standard_D2_v3", vm_count: 5 }
+      - { vm_location: "westindia", vm_size: "Standard_D2s_v3", vm_count: 5 }
+      - { vm_location: "westus", vm_size: "Standard_D2s_v3", vm_count: 5 }
+      - { vm_location: "westus2", vm_size: "Standard_D2s_v3", vm_count: 5 }
+
+  tasks:
+  - name: Generate regional resources
+    include_tasks: tasks/azure_region.yml
+    vars:
+      vm_location: "{{ item.vm_location }}"
+    with_items: "{{ azure_infra }}"
+
+  - name: Generate VMs
+    include_tasks: tasks/azure_vm.yml
+    vars:
+      vm_group_prefix: "az"
+      vm_group_suffix: "tgproxy"
+      vm_group_name: "az-{{ outer_item.vm_location }}-tgproxy"
+      vm_location: "{{ outer_item.vm_location }}"
+      vm_size: "{{ outer_item.vm_size }}"
+      vm_count: "{{ outer_item.vm_count }}"
+    with_items: "{{ azure_infra }}"
+    loop_control:
+      loop_var: outer_item

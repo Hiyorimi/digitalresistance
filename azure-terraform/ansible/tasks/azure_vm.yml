@@ -1,0 +1,6 @@
+---
+
+- name: Generating .tf files for group {{ vm_group_name }}
+  template:
+    src: vm.tf.j2
+    dest: "{{ terraform_dir }}/{{ vm_group_name }}.tf"

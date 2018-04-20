@@ -71,7 +71,7 @@ REGIONS.each do |region|
         puts "    users: #{/Has (\d+) connected clients/.match(tm_info) && /Has (\d+) connected clients/.match(tm_info)[1]}"
 
 
-        need_reboot_instance = true if telegram_status.nil? || telegram_status.downcase.include?('disabled')
+        need_reboot_instance = true if telegram_status.nil? || telegram_status.downcase.include?('disabled') || telegram_status.downcase.include?('banned')
       end
 
     end

@@ -68,7 +68,7 @@ REGIONS.each do |region|
         telegram_status = /External issues: ([\s\w\d]+)\./.match(tm_info) && /External issues: ([\s\w\d]+)\./.match(tm_info)[1]
 
         puts "    Telegram status: #{telegram_status}"
-        puts "    users: #{/Has (\d+) connected clients/.match(tm_info)[1]}"
+        puts "    users: #{/Has (\d+) connected clients/.match(tm_info) && /Has (\d+) connected clients/.match(tm_info)[1]}"
 
 
         need_reboot_instance = true if telegram_status.nil? || telegram_status.downcase.include?('disabled')
